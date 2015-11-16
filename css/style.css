@@ -1,0 +1,78 @@
+.body {
+	padding-top: 45px;
+}
+
+.transport-table {
+	width: auto !important;
+}
+
+.transport-table tr {
+	height: 50px !important;
+}
+
+.transport-table tr td {
+	width: 50px !important;
+	padding: 0px !important;
+}
+
+.transport-table tr td span {
+	display: inline-block;
+	width: 49px;
+	height: 25px;
+	float: left;
+	font-weight: bold;
+	padding: 2px;
+	font-size: 16px;
+}
+
+.transport-table tr td span:first-child {
+	text-align: right;
+}
+
+.transport-table input {
+	width: 100%;
+	height: 100%;
+	border: 0px;
+	text-align: center;
+}
+
+#transport-results {
+	margin-bottom: 20px;
+}
+
+.transport-result-table {
+	width: auto !important;
+	margin-top: 20px;
+}
+
+.transport-result-table tr {
+	height: 50px !important;
+}
+
+.transport-result-table tr td {
+	width: 100px !important;
+	padding: 0px !important;
+}
+
+.transport-result-table tr td span {
+	display: inline-block;
+	width: 49px;
+	height: 25px;
+	float: left;
+}
+
+.transport-result-table tr td.up span.cost  {
+	border-right: 2px solid #ff0000;
+}
+
+.transport-result-table tr td.left span.cost  {
+	border-bottom: 2px solid #ff0000;
+}
+
+.transport-result-table tr td.right span.none  {
+	border-bottom: 2px solid #ff0000;
+}
+
+.transport-result-table tr td.down span.field  {
+	border-right: 2px solid #ff0000;
+}
