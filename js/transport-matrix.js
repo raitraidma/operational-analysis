@@ -6,6 +6,7 @@ function TransportMatrix(warehousesCount, consumersCount) {
 	this.matrix = [];
 	this.contour = null;
 	this.goodsCountToRedistribute = null;
+	this.extraBaseIteration = 0;
 	for (var i = 0; i < warehousesCount; i++) {
 		var row = [];
 		for (var j = 0; j < consumersCount; j++) {

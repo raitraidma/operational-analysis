@@ -34,15 +34,10 @@ TransportResolver.prototype.resolve = function() {
 		console.log("findGoodsCountToRedistribute");
 		this.findGoodsCountToRedistribute(matrix);
 		console.log("createNewMatrix");
-		var newMatrix = this.createNewMatrix(matrix);
+		var baseIteration = (matrix.getGoodsCountToRedistribute() == 0) ? matrix.extraBaseIteration : 0;
+		var newMatrix = this.createNewMatrix(matrix, baseIteration);
 		this.transportMatrices.push(newMatrix);
 		iteration++;
-		
-		// TODO: REMOVE
-		if (iteration == 20) {
-			console.log("TODO: REMOVE THIS BLOCK");
-			return;
-		}
 	}
 }
 
@@ -66,7 +61,7 @@ TransportResolver.prototype.findInitialTransportMatrix = function() {
 			matrix.setConsumerCarriage(w, c, takeFromWarehouse);
 		}
 	}
-	this.addExtraBasesIfNeeded(matrix);
+	this.addExtraBasesIfNeeded(matrix, 0);
 	this.transportMatrices.push(matrix);
 }
 
@@ -271,7 +266,7 @@ TransportResolver.prototype.findGoodsCountToRedistribute = function(matrix) {
 	matrix.setGoodsCountToRedistribute(redistribute);
 }
 
-TransportResolver.prototype.createNewMatrix = function(oldMatrix) {
+TransportResolver.prototype.createNewMatrix = function(oldMatrix, baseIteration) {
 	var newMatrix = new TransportMatrix(oldMatrix.getWarehousesCount(), oldMatrix.getConsumersCount());
 
 	for (var w = 0; w < newMatrix.getWarehousesCount(); w++) {
@@ -292,22 +287,68 @@ TransportResolver.prototype.createNewMatrix = function(oldMatrix) {
 		childNode = childNode.childNode;
 	}
 
-	this.addExtraBasesIfNeeded(newMatrix);
+	this.addExtraBasesIfNeeded(newMatrix, baseIteration);
 
 	return newMatrix;
 }
 
-TransportResolver.prototype.addExtraBasesIfNeeded = function(matrix) {
+TransportResolver.prototype.addExtraBasesIfNeeded = function(matrix, baseIteration) {
+	if (matrix.getBaseVariablesCount() === this.baseVariables) {
+		return;
+	}
+	var i = 0;
 	for (var c = 0; c < matrix.getConsumersCount(); c++) {
 		for (var w = 0; w < matrix.getWarehousesCount(); w++) {
-			if (matrix.getBaseVariablesCount() === this.baseVariables) {
-				return;
-			}
-			if (!matrix.consumerCarriageExists(w, c)) {
+			i++;
+			if (!matrix.consumerCarriageExists(w, c) && this.potentialsAreBounded(matrix, [w, c]) && i > baseIteration) {
 				matrix.setConsumerCarriage(w, c, 0);
+				matrix.extraBaseIteration = i;
+				return;
 			}
 		}
 	}
+}
+
+TransportResolver.prototype.potentialsAreBounded = function(matrix, newBaseField) {
+	var wf = newBaseField[0];
+	var cf = newBaseField[1];
+	var uPotentials = [];
+	var vPotentials = [];
+
+	for (var i = 0; i < matrix.getWarehousesCount(); i++) {
+		uPotentials[i] = false;
+	}
+	uPotentials[0] = true;
+
+	for (var i = 0; i < matrix.getConsumersCount(); i++) {
+		vPotentials[i] = false;
+	}
+
+	matrix.setConsumerCarriage(wf, cf, 0);
+	for (var i = 0; i < (uPotentials.length + vPotentials.length); i++) {
+		for (var w = 0; w < uPotentials.length; w++) {
+			if (uPotentials[w] === true) {
+				for (var c = 0; c < vPotentials.length; c++) {
+					if (matrix.consumerCarriageExists(w, c)) {
+						vPotentials[c] = true;
+					}
+				}
+			}
+		}
+
+		for (var c = 0; c < vPotentials.length; c++) {
+			if (vPotentials[c] === true) {
+				for (var w = 0; w < uPotentials.length; w++) {
+					if (matrix.consumerCarriageExists(w, c)) {
+						uPotentials[w] = true;
+					}
+				}
+			}
+		}
+	}
+	matrix.setConsumerCarriage(wf, cf, null);
+
+	return !(uPotentials.contains(false) || vPotentials.contains(false));
 }
 
 TransportResolver.prototype.getMatrixValue = function(matrix) {
