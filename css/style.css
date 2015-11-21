@@ -76,3 +76,14 @@
 .transport-result-table tr td.down span.field  {
 	border-right: 2px solid #ff0000;
 }
+
+.base {
+	text-align: right;
+	font-weight: bold;
+	font-size: 16px;
+}
+
+.field {
+	font-style: italic;
+	font-size: 16px;
+}

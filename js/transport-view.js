@@ -117,6 +117,25 @@ TransportView.prototype.bindTestDataButton = function() {
 		that.checkConsumerRemoveButton();
 		that.checkWarehouseRemoveButton();
 	});
+
+	$('#example-6').click(function() {
+		that.consumers = [15, 15, 16, 15, 15, 14, 13];
+		that.warehouses = [19, 19, 19, 19, 15, 12];
+		that.transportCosts = [
+			[21, 17, 12, 24, 30,  4,  5],
+			[ 6,  1,  9,  5,  9, 21,  4],
+			[ 7,  5, 24,  6, 13, 23, 32],
+			[29, 22, 21,  5,  7, 12, 14],
+			[17,  6, 28,  9, 26,  8,  6],
+			[ 4, 76,  9, 24,  6,  9,  7]
+		];
+		that.warehouseCount = that.warehouses.length;
+		that.consumerCount = that.consumers.length;
+		that.createTransportTable();
+
+		that.checkConsumerRemoveButton();
+		that.checkWarehouseRemoveButton();
+	});
 }
 
 TransportView.prototype.bindConsumerButtons = function() {
@@ -351,7 +370,7 @@ TransportView.prototype.displayResults = function() {
 		}
 
 		$('#transport-results').append(tableHtml);
-		$('#transport-results').append('Z = ' + this.transportResolver.getMatrixValue(matrix));
+		$('#transport-results').append('<strong>Z = ' + this.transportResolver.getMatrixValue(matrix) + '</strong>');
 	}
 
 	$('#transport-results').removeClass('hidden');
