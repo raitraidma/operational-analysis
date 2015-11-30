@@ -34,6 +34,8 @@
 	height: 100%;
 	border: 0px;
 	text-align: center;
+	height: 50px;
+	line-height: 50px;.
 }
 
 #transport-results {
@@ -77,6 +79,10 @@
 	border-right: 2px solid #ff0000;
 }
 
+.cost {
+	color: #aaaaaa;
+}
+
 .base {
 	text-align: right;
 	font-weight: bold;
@@ -85,5 +91,28 @@
 
 .field {
 	font-style: italic;
+	font-size: 16px;
+}
+
+#transport-results textarea {
+	height: 80px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+#transport-results table tr td .consumer-label {
+	text-align: right;
+	width: 100px;
+	float: left;
+	font-weight: bold;
+	padding: 2px;
+	font-size: 16px;
+}
+
+#transport-results table tr td .warehouse-label {
+	width: 100px;
+	float: left;
+	font-weight: bold;
+	padding: 2px;
 	font-size: 16px;
 }

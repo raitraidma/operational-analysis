@@ -19,11 +19,18 @@ TransportView.prototype.reset = function() {
 
 TransportView.prototype.showTable = function() {
 	this.createTransportTable();
+	this.bindResetButton();
 	this.bindConsumerButtons();
 	this.bindWarehouseButtons();
 	this.bindResolveButton();
 	this.bindTestDataButton();
 	$('#transport-table-view').removeClass('hidden');
+}
+
+TransportView.prototype.bindResetButton = function() {
+	$('#reset').click(function() {
+		location.reload();
+	});
 }
 
 TransportView.prototype.bindResolveButton = function() {
@@ -298,6 +305,10 @@ TransportView.prototype.resolve = function() {
 		this.showErrors(trans('consumer.needs.no.not.match.warehouse.supplies'));
 		return;
 	}
+	if (this.transportCostsAreMissing()) {
+		this.showErrors(trans('transport.costs.are.missing'));
+		return;
+	}
 	this.transportResolver = new TransportResolver(this.readConsumers(), this.readWarehouses(), this.readTransportCosts());
 	this.transportResolver.resolve();
 	this.displayResults();
@@ -315,6 +326,19 @@ TransportView.prototype.customerNeedsWarehouseSuppliesDoNotMatch = function() {
 		warehousesSupplies += warehouses[i];
 	}
 	return consumersNeeds !== warehousesSupplies;
+}
+
+TransportView.prototype.transportCostsAreMissing = function () {
+	var transportCosts = this.readTransportCosts();
+	for (var i = 0; i < transportCosts.length; i++) {
+		for (var j = 0; j < transportCosts[i].length; j++) {
+			var value = transportCosts[i][j];
+			if (isNaN(value)) {
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 TransportView.prototype.displayResults = function() {
@@ -341,7 +365,7 @@ TransportView.prototype.displayResults = function() {
 				var cellHtml = $('<td>');
 
 				if (row === 0 && column === 0) {
-					cellHtml.append('<div>T</div><div>L</div>');
+					cellHtml.append('<span class="consumer-label">T</span><span class="warehouse-label">L</span>');
 				} else if (row === 0) {
 					cellHtml.append(consumers[column-1]);
 				} else if (column === 0) {
@@ -373,6 +397,41 @@ TransportView.prototype.displayResults = function() {
 		$('#transport-results').append('<strong>Z = ' + this.transportResolver.getMatrixValue(matrix) + '</strong>');
 	}
 
+	resultMatrices = $('<textarea class="form-control"></textarea>');
+	var resultMatricesText = '';
+
+	resultMatricesText += 'T = {';
+	for (var i = 0; i < consumers.length; i++) {
+		if (i > 0) { resultMatricesText += ', ' }
+		resultMatricesText += consumers[i];
+	}
+	resultMatricesText += '}';
+	resultMatricesText += "\n";
+	resultMatricesText += 'L = {';
+	for (var i = 0; i < warehouses.length; i++) {
+		if (i > 0) { resultMatricesText += ', ' }
+		resultMatricesText += warehouses[i];
+	}
+	resultMatricesText += '}';
+	resultMatricesText += "\n";
+	resultMatricesText += 'X = {';
+	if (this.transportResolver.transportMatrices.length > 0) {
+		var resultMatrix = this.transportResolver.transportMatrices[this.transportResolver.transportMatrices.length-1].matrix;
+		for (var r = 0; r < resultMatrix.length; r++) {
+			if (r > 0) { resultMatricesText += ', ' }
+			resultMatricesText += '{';
+			for (var c = 0; c < resultMatrix[r].length; c++) {
+				if (c > 0) { resultMatricesText += ', ' }
+				resultMatricesText += resultMatrix[r][c].carriage || 0;
+			}
+			resultMatricesText += '}';
+		}
+	}
+	resultMatricesText += '}';
+
+	resultMatrices.text(resultMatricesText);
+
+	$('#transport-results').append(resultMatrices);
 	$('#transport-results').removeClass('hidden');
 }
 
